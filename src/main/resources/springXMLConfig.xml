@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <!-- Property placeholder-->
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>${property_file.source}:resources/pride-asa-pipeline-core.properties
+                </value>
+            </list>
+        </property>
+        <property name="ignoreUnresolvablePlaceholders">
+            <value>true</value>
+        </property>
+    </bean>
+
+    <!-- pipeline beans -->
+    <bean id="dbCommandLineRunner"
+          class="com.compomics.pride_asa_pipeline.core.DbCommandLineRunner" lazy-init="true">
+        <property name="dbSpectrumAnnotator" ref="dbSpectrumAnnotator"/>
+        <property name="dbResultHandler" ref="dbResultHandler"/>
+    </bean>
+
+    <bean id="fileCommandLineRunner"
+          class="com.compomics.pride_asa_pipeline.core.FileCommandLineRunner" lazy-init="true">
+        <property name="fileSpectrumAnnotator" ref="fileSpectrumAnnotator"/>
+        <property name="fileResultHandler" ref="resultHandler"/>
+    </bean>
+
+    <bean id="dbSpectrumAnnotator"
+          class="com.compomics.pride_asa_pipeline.core.logic.DbSpectrumAnnotator" lazy-init="true">
+        <property name="experimentService" ref="dbExperimentService"/>
+        <property name="spectrumService" ref="dbSpectrumService"/>
+        <property name="modificationService" ref="dbModificationService"/>
+        <property name="pipelineModificationService" ref="pipelineModificationService"/>
+        <property name="massRecalibrator" ref="massRecalibrator"/>
+        <property name="spectrumMatcher" ref="spectrumMatcher"/>
+        <property name="peptideVariationsGenerator" ref="peptideVariationsGenerator"/>
+    </bean>
+
+    <bean id="fileSpectrumAnnotator"
+          class="com.compomics.pride_asa_pipeline.core.logic.FileSpectrumAnnotator" lazy-init="true">
+        <property name="experimentService" ref="fileExperimentService"/>
+        <property name="spectrumService" ref="fileSpectrumService"/>
+        <property name="modificationService" ref="fileModificationService"/>
+        <property name="pipelineModificationService" ref="pipelineModificationService"/>
+        <property name="massRecalibrator" ref="massRecalibrator"/>
+        <property name="spectrumMatcher" ref="spectrumMatcher"/>
+        <property name="peptideVariationsGenerator" ref="peptideVariationsGenerator"/>
+    </bean>
+
+    <!-- transaction beans -->
+    <bean id="prideDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+        <property name="driverClassName" value="${db.driver}"/>
+        <property name="url" value="${db.url}"/>
+        <property name="username" value="${db.username}"/>
+        <property name="password" value="${db.password}"/>
+        <property name="initialSize" value="${db.initial_pool_size}"/>
+        <property name="maxActive" value="${db.max_pool_size}"/>
+    </bean>
+
+    <!-- service beans -->
+    <bean id="dbExperimentService"
+          class="com.compomics.pride_asa_pipeline.core.service.impl.DbExperimentServiceImpl">
+        <property name="experimentRepository" ref="experimentRepository"/>
+        <property name="spectrumService" ref="dbSpectrumService"/>
+        <property name="resultHandler" ref="dbResultHandler"/>
+    </bean>
+
+    <bean id="fileExperimentService"
+          class="com.compomics.pride_asa_pipeline.core.service.impl.FileExperimentServiceImpl">
+        <property name="experimentRepository" ref="experimentRepository"/>
+        <property name="resultHandler" ref="resultHandler"/>
+    </bean>
+
+    <bean id="dbSpectrumService"
+          class="com.compomics.pride_asa_pipeline.core.service.impl.DbSpectrumServiceImpl">
+        <property name="spectrumRepository" ref="spectrumRepository"/>
+        <property name="spectrumPeaksCache" ref="spectrumPeaksCache"/>
+    </bean>
+
+    <bean id="fileSpectrumService"
+          class="com.compomics.pride_asa_pipeline.core.service.impl.FileSpectrumServiceImpl">
+    </bean>
+
+    <bean id="dbModificationService"
+          class="com.compomics.pride_asa_pipeline.core.service.impl.DbModificationServiceImpl">
+        <property name="modificationRepository" ref="modificationRepository"/>
+        <property name="omssaModificationMarshaller" ref="omssaModificationMarshaller"/>
+    </bean>
+
+    <bean id="fileModificationService"
+          class="com.compomics.pride_asa_pipeline.core.service.impl.FileModificationServiceImpl">
+        <property name="omssaModificationMarshaller" ref="omssaModificationMarshaller"/>
+    </bean>
+
+    <bean id="pipelineModificationService"
+          class="com.compomics.pride_asa_pipeline.core.service.impl.PipelineModificationServiceImpl">
+        <property name="modificationMarshaller" ref="modificationMarshaller"/>
+        <property name="omssaModificationMarshaller" ref="omssaModificationMarshaller"/>
+    </bean>
+
+    <bean id="dbResultHandler"
+          class="com.compomics.pride_asa_pipeline.core.service.impl.ResultHandlerImpl">
+        <property name="fileResultHandler" ref="fileResultHandler"/>
+        <property name="modificationMarshaller" ref="modificationMarshaller"/>
+    </bean>
+
+    <bean id="resultHandler"
+          class="com.compomics.pride_asa_pipeline.core.service.impl.ResultHandlerImpl" lazy-init="true">
+        <property name="fileResultHandler" ref="fileResultHandler"/>
+        <property name="modificationMarshaller" ref="modificationMarshaller"/>
+    </bean>
+
+    <!-- repository beans -->
+    <bean id="experimentRepository"
+          class="com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository">
+        <!--    <property name="dataSource" ref="prideDataSource"/>-->
+    </bean>
+
+    <bean id="spectrumRepository"
+          class="com.compomics.pride_asa_pipeline.core.repository.impl.file.FileSpectrumRepository">
+        <!--    <property name="dataSource" ref="prideDataSource"/>-->
+    </bean>
+
+    <bean id="modificationRepository"
+          class="com.compomics.pride_asa_pipeline.core.repository.impl.combo.FileExperimentModificationRepository">
+        <!--    <property name="dataSource" ref="prideDataSource"/>-->
+    </bean>
+
+    <bean id="fileResultHandler"
+          class="com.compomics.pride_asa_pipeline.core.repository.impl.FileResultHandlerImpl">
+        <!--    <property name="dataSource" ref="prideDataSource"/>-->
+    </bean>
+
+    <!-- encode/decode beans -->
+    <bean id="base64DecoderMapper"
+          class="com.compomics.pride_asa_pipeline.core.data.mapper.Base64DecoderMapper">
+        <property name="base64DataDecoder" ref="base64DataDecoder"/>
+    </bean>
+
+    <bean id="base64DataDecoder"
+          class="com.compomics.pride_asa_pipeline.core.logic.spectrum.decode.impl.Base64DataDecoderImpl">
+    </bean>
+
+    <!-- modification beans -->
+    <bean id="modificationMarshaller"
+          class="com.compomics.pride_asa_pipeline.core.logic.modification.impl.ModificationMarshallerImpl">
+    </bean>
+
+    <bean id="peptideVariationsGenerator"
+          class="com.compomics.pride_asa_pipeline.core.logic.impl.PeptideVariationsGeneratorImpl">
+    </bean>
+
+    <bean id="omssaModificationMarshaller"
+          class="com.compomics.pride_asa_pipeline.core.logic.modification.impl.OmssaModificationMarshallerImpl">
+    </bean>
+
+    <!-- spectrum beans -->
+    <bean id="spectrumMatcher"
+          class="com.compomics.pride_asa_pipeline.core.logic.spectrum.match.impl.SpectrumMatcherImpl">
+        <property name="identificationScorer" ref="identificationScorer"/>
+        <property name="noiseFilter" ref="noiseFilter"/>
+        <property name="noiseThresholdFinder" ref="noiseThresholdFinder"/>
+    </bean>
+
+    <bean id="identificationScorer"
+          class="com.compomics.pride_asa_pipeline.core.logic.spectrum.score.impl.IdentificationScorerImpl">
+    </bean>
+
+    <bean id="noiseFilter"
+          class="com.compomics.pride_asa_pipeline.core.logic.spectrum.filter.impl.PeakNoiseFilter">
+    </bean>
+
+    <bean id="noiseThresholdFinder"
+          class="com.compomics.pride_asa_pipeline.core.logic.spectrum.filter.impl.NoiseThresholdFinderImpl">
+    </bean>
+
+    <!-- recalibration beans -->
+    <bean id="massRecalibrator"
+          class="com.compomics.pride_asa_pipeline.core.logic.recalibration.impl.MassRecalibratorImpl">
+        <property name="massWindowFinder" ref="massWindowFinder"/>
+    </bean>
+
+    <!--    <bean id="massRecalibrator"
+          class="com.compomics.pride_asa_pipeline.core.logic.recalibration.impl.StubMassRecalibrator">
+        <property name="massWindowFinder" ref="massWindowFinder"/>
+    </bean>-->
+
+    <bean id="massWindowFinder"
+          class="com.compomics.pride_asa_pipeline.core.logic.recalibration.impl.SimpleMassWindowFinder">
+    </bean>
+
+    <!-- other beans -->
+    <bean id="spectrumPeaksCache"
+          class="com.compomics.pride_asa_pipeline.core.cache.impl.SpectrumPeaksCache">
+    </bean>
+
+    <!-- ols soap service client -->
+    <!--    <jaxws:client id="olsClient"
+    serviceClass="uk.ac.ebi.ontology_lookup.ontologyquery.Query"
+    address="http://www.ebi.ac.uk/ontology-lookup/services/OntologyQuery" />-->
+
+</beans>

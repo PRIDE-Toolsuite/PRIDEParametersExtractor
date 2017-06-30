@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+        <action>
+            <actionName>CUSTOM-BuildMaven</actionName>
+            <displayName>BuildMaven</displayName>
+            <goals>
+                <goal>assembly:single</goal>
+            </goals>
+            <properties>
+                <Env.MAVEN_OPTS>-Xss16m</Env.MAVEN_OPTS>
+            </properties>
+        </action>
+    </actions>

@@ -1,0 +1,324 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.compomics</groupId>
+    <artifactId>PRIDESearchparameterExtractor</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+      
+      
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <main.class>com.compomics.pridesearchparameterextractor.cmd.PrideSearchparameterExtractor</main.class>  
+    </properties> 
+      
+    <build><!-- Copy the resources required during building -->
+   
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+                <includes>
+                    <include>**/pride-asa-pipeline-core.properties</include>
+                    <include>springXMLConfig.xml</include>
+                </includes>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>false</filtering>
+                <excludes>
+                    <exclude>**/pride-asa-pipeline-core.properties</exclude>
+                    <exclude>springXMLConfig.xml</exclude>
+                </excludes>
+            </resource>
+        </resources>
+        
+        <extensions> 
+            <extension> 
+                <groupId>org.apache.maven.wagon</groupId> 
+                <artifactId>wagon-ssh</artifactId> 
+                <version>2.2</version> 
+            </extension> 
+        </extensions>
+        
+        <!-- Plugins -->
+        <plugins>                                   
+<!--            <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-codegen-plugin</artifactId>
+                <version>2.7.5</version>
+                <executions>
+                    <execution>
+                        <id>generate-sources</id>
+                        <phase>generate-sources</phase>
+                        <configuration>
+                            <sourceRoot>${project.build.directory}/generated-sources/cxf</sourceRoot>
+                            <wsdloptions>
+                                <wsdloption>
+                                    <wsdl>${basedir}/src/main/resources/wsdl/OntologyQuery.wsdl</wsdl>                                    
+                                </wsdloption>
+                            </wsdloptions>
+                        </configuration>
+                       
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                    </execution>
+                </executions>            
+            </plugin>-->
+            
+            <!-- Surefire plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.12.3</version>
+                <configuration>
+                    <forkMode>always</forkMode>
+                </configuration>
+            </plugin>
+            
+            <!-- code coverage plugin -->
+            <!--            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.5.7.201204190339</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>-->
+
+            <!-- Dependency plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>2.5.1</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}/lib
+                            </outputDirectory>
+                            <overWriteReleases>true</overWriteReleases>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                            <excludeTransitive>false</excludeTransitive>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Jar plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${main.class}</mainClass>
+                            <!--<mainClass>com.compomics.pride_asa_pipeline.StarterWrapper</mainClass>-->
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib</classpathPrefix>
+                        </manifest>
+                        <!--                        <manifestEntries>
+                            <Class-Path>ext/</Class-Path>
+                        </manifestEntries>-->
+                    </archive>
+                    <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}
+                    </outputDirectory>
+                </configuration>
+            </plugin>
+
+            <!-- Resources plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <id>copy-package-resources</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>
+                                ${project.build.directory}/${project.artifactId}-${project.version}/resources
+                            </outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>src/main/resources/resources</directory> 
+                                    <filtering>true</filtering>                                   
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>                   
+                    <execution>
+                        <id>copy-package-license</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/${project.artifactId}-${project.version}
+                            </outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.basedir}</directory>
+                                    <includes>
+                                        <include>LICENSE-2.0.txt</include>
+                                    </includes>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>                       
+            
+            <!-- Create installer with dependencies inside instead of lib folder -->
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>${main.class}</mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+                  
+            <!-- site plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-site-plugin</artifactId>
+                <version>3.2</version>
+                <configuration>
+                    <reportPlugins>
+                        
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>findbugs-maven-plugin</artifactId>
+                            <version>2.5.2</version>
+                            <configuration>
+                                <xmlOutput>true</xmlOutput>
+                                <xmlOutputDirectory>target/site</xmlOutputDirectory>
+                                <!--<excludeFilterFile>findbugs-exclude.xml</excludeFilterFile>-->
+                            </configuration>
+                        </plugin>
+            
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-pmd-plugin</artifactId>
+                            <version>2.7.1</version>
+                            <configuration>
+                                <targetJdk>1.6</targetJdk>
+                                <ignoreAnnotations>false</ignoreAnnotations>
+                            </configuration>
+                        </plugin>
+            
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-jxr-plugin</artifactId>
+                            <version>2.3</version>
+                            <configuration>
+                                <aggregate>true</aggregate>
+                            </configuration>
+                        </plugin>
+            
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-project-info-reports-plugin</artifactId>
+                            <version>2.6</version>
+                        </plugin>
+            
+                        <plugin>
+                            <groupId>org.codehaus.mojo</groupId>
+                            <artifactId>cobertura-maven-plugin</artifactId>
+                            <version>2.5.2</version>
+                            <configuration>
+                                <formats>
+                                    <format>html</format>
+                                    <format>xml</format>
+                                </formats>
+                            </configuration>
+                            
+                        </plugin>
+                    </reportPlugins>
+                </configuration>
+            </plugin>
+        </plugins>
+      
+    </build>
+    
+    
+    <repositories>   
+        
+        
+        <repository>
+            <id>genesis-maven-repo</id>
+            <name>Genesis maven repository</name>
+            <url>http://genesis.UGent.be/maven</url>
+            <layout>default</layout>
+        </repository>
+        
+        <repository>
+            <id>genesis-maven2-repo</id>
+            <name>Genesis maven2 repository</name>
+            <url>http://genesis.UGent.be/maven2</url>
+            <layout>default</layout>
+        </repository>
+        
+
+        <!-- EBI repo -->
+        <repository>
+            <id>nexus-ebi-repo</id>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo</url>
+        </repository>
+
+        <!-- EBI SNAPSHOT repo -->
+        <repository>
+            <id>nexus-ebi-repo-snapshots</id>
+            <url>http://www.ebi.ac.uk/intact/maven/nexus/content/repositories/ebi-repo-snapshots</url>
+        </repository>
+                                                
+
+                                                     
+    </repositories>
+    
+    <dependencies>
+        <dependency>
+            <groupId>com.compomics.pride-asa-pipeline</groupId>
+            <artifactId>pride-asa-pipeline-core</artifactId>
+            <version>1.7.3-SNAPSHOT</version>
+            <type>jar</type>
+        </dependency>
+    </dependencies>
+    
+    <profiles>
+        <profile>
+            <id>development</id>
+            <properties>
+                <property_file.source>classpath</property_file.source>
+            </properties>
+        </profile>
+    </profiles>
+</project>
