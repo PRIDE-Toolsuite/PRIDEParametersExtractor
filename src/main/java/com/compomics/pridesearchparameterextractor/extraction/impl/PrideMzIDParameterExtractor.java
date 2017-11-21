@@ -1,11 +1,15 @@
 package com.compomics.pridesearchparameterextractor.extraction.impl;
 
 import com.compomics.pride_asa_pipeline.core.data.extractor.FileParameterExtractor;
-import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
+import com.compomics.pride_asa_pipeline.model.MGFExtractionException;
+import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.pridesearchparameterextractor.extraction.PrideParameterExtractor;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
 import org.apache.log4j.Logger;
 
 /**
@@ -66,6 +70,8 @@ public class PrideMzIDParameterExtractor implements PrideParameterExtractor{
         this.outputFolder = outputFolder;
     }
 
+
+
     /**
      * Analyzes the provided input and generates the parameter file at the
      * provided outputfolder
@@ -73,17 +79,16 @@ public class PrideMzIDParameterExtractor implements PrideParameterExtractor{
      * @return a boolean indicating the success of the extraction
      */
     @Override
-    public boolean analyze() {
+    public boolean analyze() throws ParameterExtractionException, ExecutionException, TimeoutException, MGFExtractionException, InterruptedException {
         boolean succeeded = false;
         try {
             FileParameterExtractor extractor = new FileParameterExtractor(outputFolder);
-            extractor.analyzeMzID(inputFile,peakFiles, inputFile.getName(), saveMGF,false);
+            extractor.analyzeMzID(inputFile,peakFiles, inputFile.getName());
             succeeded = true;
         } catch (IOException ex) {
             LOGGER.error(ex);
-        } finally {
-            return succeeded;
         }
+        return succeeded;
     }
 
 }

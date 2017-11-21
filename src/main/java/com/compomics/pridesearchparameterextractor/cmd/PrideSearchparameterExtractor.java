@@ -1,6 +1,6 @@
 package com.compomics.pridesearchparameterextractor.cmd;
 
-import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
+import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.pridesearchparameterextractor.extraction.PrideParameterExtractor;
 import com.compomics.pridesearchparameterextractor.extraction.impl.PrideMzIDParameterExtractor;
 import com.compomics.pridesearchparameterextractor.extraction.impl.PrideXMLParameterExtractor;
@@ -14,7 +14,6 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
-import org.apache.log4j.BasicConfigurator;
 
 import org.apache.log4j.Logger;
 
@@ -119,7 +118,7 @@ public class PrideSearchparameterExtractor {
             if (extractor.analyze()) {
                 LOGGER.info("The analysis was completed succesfully");
             }
-        } catch (ParameterExtractionException ex) {
+        } catch (Exception ex) {
             LOGGER.error(ex);
         }
     }

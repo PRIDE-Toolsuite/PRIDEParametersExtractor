@@ -1,10 +1,9 @@
 package com.compomics.pridesearchparameterextractor.extraction.impl;
 
 import com.compomics.pride_asa_pipeline.core.data.extractor.FileParameterExtractor;
-import com.compomics.pride_asa_pipeline.core.exceptions.ParameterExtractionException;
+import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.pridesearchparameterextractor.extraction.PrideParameterExtractor;
 import java.io.File;
-import java.io.IOException;
 import org.apache.log4j.Logger;
 
 /**
@@ -68,7 +67,7 @@ public class PrideXMLParameterExtractor implements PrideParameterExtractor {
         boolean succeeded = false;
         try {
             FileParameterExtractor extractor = new FileParameterExtractor(outputFolder);
-            extractor.analyzePrideXML(inputFile, inputFile.getName(), saveMGF,false);
+            extractor.analyzePrideXML(inputFile, inputFile.getName());
             succeeded = true;
         } catch (Exception ex) {
             LOGGER.error(ex);

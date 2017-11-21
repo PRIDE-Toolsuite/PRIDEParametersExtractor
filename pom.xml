@@ -12,7 +12,6 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-        <main.class>com.compomics.pridesearchparameterextractor.cmd.PrideSearchparameterExtractor</main.class>  
     </properties>
 
     <developers>
@@ -110,7 +109,6 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.5.1</version>
                 <executions>
                     <execution>
                         <id>copy-dependencies</id>
@@ -137,8 +135,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>${main.class}</mainClass>
-                            <!--<mainClass>com.compomics.pride_asa_pipeline.StarterWrapper</mainClass>-->
+                             <!--<mainClass>com.compomics.pride_asa_pipeline.StarterWrapper</mainClass>-->
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib</classpathPrefix>
                         </manifest>
@@ -201,11 +198,6 @@
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>${main.class}</mainClass>
-                        </manifest>
-                    </archive>
                     <descriptorRefs>
                         <descriptorRef>jar-with-dependencies</descriptorRef>
                     </descriptorRefs>
@@ -330,7 +322,7 @@
         <dependency>
             <groupId>com.compomics.pride-asa-pipeline</groupId>
             <artifactId>pride-asa-pipeline-core</artifactId>
-            <version>1.7.3-SNAPSHOT</version>
+            <version>1.7.4.faster</version>
             <type>jar</type>
         </dependency>
     </dependencies>

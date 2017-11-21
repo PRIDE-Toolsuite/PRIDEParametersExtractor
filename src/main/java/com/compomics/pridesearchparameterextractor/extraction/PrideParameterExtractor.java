@@ -1,5 +1,11 @@
 package com.compomics.pridesearchparameterextractor.extraction;
 
+import com.compomics.pride_asa_pipeline.model.MGFExtractionException;
+import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
+
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeoutException;
+
 /**
  *
  * @author Kenneth Verheggen
@@ -12,5 +18,5 @@ public interface PrideParameterExtractor {
      *
      * @return a boolean indicating the success of the extraction
      */
-    public boolean analyze();
+    public boolean analyze() throws ParameterExtractionException, ExecutionException, TimeoutException, MGFExtractionException, InterruptedException;
 }
