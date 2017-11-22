@@ -28,10 +28,15 @@ public class PrideMzIDParameterExtractor implements PrideParameterExtractor{
      * A list of peakfiles belonging to this mzID
      */
     private final List<File> peakFiles;
+
+    //Save the output of Ids
+    private Boolean saveIDs = true;
     /**
      * The folder to store the resulting file(s)
      */
-    private final File outputFolder;
+    private File outputFolder = null;
+
+    private String outputFile = null;
     /**
      * Boolean indicating if the mgf file should be exported as well
      */
@@ -70,6 +75,13 @@ public class PrideMzIDParameterExtractor implements PrideParameterExtractor{
         this.outputFolder = outputFolder;
     }
 
+    public PrideMzIDParameterExtractor(File inputFile, List<File> peakFiles, String fileName, Boolean saveMGF, Boolean saveIds) {
+        this.inputFile = inputFile;
+        this.peakFiles = peakFiles;
+        this.outputFile = fileName;
+        this.saveMGF = saveMGF;
+        this.saveIDs = saveIds;
+    }
 
 
     /**
@@ -81,8 +93,16 @@ public class PrideMzIDParameterExtractor implements PrideParameterExtractor{
     @Override
     public boolean analyze() throws ParameterExtractionException, ExecutionException, TimeoutException, MGFExtractionException, InterruptedException {
         boolean succeeded = false;
+        FileParameterExtractor extractor = null;
         try {
-            FileParameterExtractor extractor = new FileParameterExtractor(outputFolder);
+            if(inputFile != null)
+                 extractor = new FileParameterExtractor(outputFile, saveMGF, saveIDs);
+            else if (outputFolder != null)
+                 extractor = new FileParameterExtractor(outputFolder, saveMGF, saveIDs);
+            else {
+                LOGGER.error("OutputFolder or FileName not defined -- File not converted");
+                return false;
+            }
             extractor.analyzeMzID(inputFile,peakFiles, inputFile.getName());
             succeeded = true;
         } catch (IOException ex) {

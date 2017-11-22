@@ -66,7 +66,7 @@ public class PrideXMLParameterExtractor implements PrideParameterExtractor {
     public boolean analyze() {
         boolean succeeded = false;
         try {
-            FileParameterExtractor extractor = new FileParameterExtractor(outputFolder);
+            FileParameterExtractor extractor = new FileParameterExtractor(outputFolder, saveMGF, false);
             extractor.analyzePrideXML(inputFile, inputFile.getName());
             succeeded = true;
         } catch (Exception ex) {
