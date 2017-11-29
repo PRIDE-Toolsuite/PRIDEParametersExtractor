@@ -1,6 +1,7 @@
 package com.compomics.pridesearchparameterextractor.extraction.impl;
 
 import com.compomics.pride_asa_pipeline.core.data.extractor.FileParameterExtractor;
+import com.compomics.pride_asa_pipeline.core.data.extractor.IParametersRefinery;
 import com.compomics.pride_asa_pipeline.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.pridesearchparameterextractor.extraction.PrideParameterExtractor;
@@ -29,6 +30,13 @@ public class PrideMzIDParameterExtractor implements PrideParameterExtractor{
      */
     private final List<File> peakFiles;
 
+    //Refinery to inject parameters from outside.
+
+    private IParametersRefinery parameterRefinery = null;
+
+    //If the assay Number is provided it should be use instead of the file name
+    private String assayNumber = null;
+
     //Save the output of Ids
     private Boolean saveIDs = true;
     /**
@@ -53,11 +61,12 @@ public class PrideMzIDParameterExtractor implements PrideParameterExtractor{
      * @throws ParameterExtractionException if the parameters could not be
      * extracted correctly
      */
-    public PrideMzIDParameterExtractor(File inputFile, List<File> peakFiles, File outputFolder, boolean saveMGF) throws ParameterExtractionException {
+    public PrideMzIDParameterExtractor(File inputFile, List<File> peakFiles, File outputFolder, boolean saveMGF, IParametersRefinery refinery) throws ParameterExtractionException {
         this.inputFile = inputFile;
         this.peakFiles = peakFiles;
         this.outputFolder = outputFolder;
         this.saveMGF = saveMGF;
+        this.parameterRefinery = refinery;
     }
 
     /**
@@ -69,18 +78,21 @@ public class PrideMzIDParameterExtractor implements PrideParameterExtractor{
      * @throws ParameterExtractionException if the parameters could not be
      * extracted correctly
      */
-    public PrideMzIDParameterExtractor(File inputFile, List<File> peakFiles, File outputFolder) throws ParameterExtractionException {
+    public PrideMzIDParameterExtractor(File inputFile, List<File> peakFiles, File outputFolder, IParametersRefinery refinery) throws ParameterExtractionException {
         this.inputFile = inputFile;
         this.peakFiles = peakFiles;
         this.outputFolder = outputFolder;
+        this.parameterRefinery = refinery;
     }
 
-    public PrideMzIDParameterExtractor(File inputFile, List<File> peakFiles, String fileName, Boolean saveMGF, Boolean saveIds) {
+    public PrideMzIDParameterExtractor(File inputFile, String assayNumber, List<File> peakFiles, String fileName, Boolean saveMGF, Boolean saveIds, IParametersRefinery refinery) {
         this.inputFile = inputFile;
         this.peakFiles = peakFiles;
         this.outputFile = fileName;
         this.saveMGF = saveMGF;
         this.saveIDs = saveIds;
+        this.assayNumber = assayNumber;
+        this.parameterRefinery =  refinery;
     }
 
 
@@ -96,14 +108,17 @@ public class PrideMzIDParameterExtractor implements PrideParameterExtractor{
         FileParameterExtractor extractor = null;
         try {
             if(inputFile != null)
-                 extractor = new FileParameterExtractor(outputFile, saveMGF, saveIDs);
+                 extractor = new FileParameterExtractor(outputFile, saveMGF, saveIDs, parameterRefinery);
             else if (outputFolder != null)
-                 extractor = new FileParameterExtractor(outputFolder, saveMGF, saveIDs);
+                 extractor = new FileParameterExtractor(outputFolder, saveMGF, saveIDs, parameterRefinery);
             else {
                 LOGGER.error("OutputFolder or FileName not defined -- File not converted");
                 return false;
             }
-            extractor.analyzeMzID(inputFile,peakFiles, inputFile.getName());
+            if(assayNumber == null)
+                assayNumber = inputFile.getName();
+
+            extractor.analyzeMzID(inputFile,peakFiles, assayNumber);
             succeeded = true;
         } catch (IOException ex) {
             LOGGER.error(ex);

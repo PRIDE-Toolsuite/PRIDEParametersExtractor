@@ -1,6 +1,5 @@
 package com.compomics.pridesearchparameterextractor.cmd;
 
-import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.pridesearchparameterextractor.extraction.PrideParameterExtractor;
 import com.compomics.pridesearchparameterextractor.extraction.impl.PrideMzIDParameterExtractor;
 import com.compomics.pridesearchparameterextractor.extraction.impl.PrideXMLParameterExtractor;
@@ -105,10 +104,10 @@ public class PrideSearchparameterExtractor {
             PrideParameterExtractor extractor;
             switch (type) {
                 case "pridexml":
-                    extractor = new PrideXMLParameterExtractor(input, output, saveMGF);
+                    extractor = new PrideXMLParameterExtractor(input, output, saveMGF, null);
                     break;
                 case "mzid":
-                    extractor = new PrideMzIDParameterExtractor(input, peakFiles, output, saveMGF);
+                    extractor = new PrideMzIDParameterExtractor(input, peakFiles, output, saveMGF, null);
                     break;
                 default:
                     throw new IllegalArgumentException("Type needs to be either pridexml or mzid");
