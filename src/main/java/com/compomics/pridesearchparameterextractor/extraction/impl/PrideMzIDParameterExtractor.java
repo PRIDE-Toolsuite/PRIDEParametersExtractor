@@ -5,6 +5,7 @@ import com.compomics.pride_asa_pipeline.core.data.extractor.IParametersRefinery;
 import com.compomics.pride_asa_pipeline.model.MGFExtractionException;
 import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.pridesearchparameterextractor.extraction.PrideParameterExtractor;
+import com.compomics.pridesearchparameterextractor.utilities.ExtractorConstants;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
@@ -118,7 +119,7 @@ public class PrideMzIDParameterExtractor implements PrideParameterExtractor{
             if(assayNumber == null)
                 assayNumber = inputFile.getName();
 
-            extractor.analyzeMzID(inputFile,peakFiles, assayNumber);
+            extractor.analyzeMzID(inputFile,peakFiles, assayNumber,ExtractorConstants.ALLOW_ONLY_PRIDE_ANNOTATED);
             succeeded = true;
         } catch (IOException ex) {
             LOGGER.error(ex);

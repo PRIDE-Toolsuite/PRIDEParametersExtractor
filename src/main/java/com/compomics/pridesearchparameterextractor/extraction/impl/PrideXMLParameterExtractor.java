@@ -4,6 +4,7 @@ import com.compomics.pride_asa_pipeline.core.data.extractor.FileParameterExtract
 import com.compomics.pride_asa_pipeline.core.data.extractor.IParametersRefinery;
 import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.pridesearchparameterextractor.extraction.PrideParameterExtractor;
+import com.compomics.pridesearchparameterextractor.utilities.ExtractorConstants;
 import java.io.File;
 import java.util.List;
 
@@ -118,7 +119,7 @@ public class PrideXMLParameterExtractor implements PrideParameterExtractor {
             if(assayNumber == null)
                 assayNumber = inputFile.getName();
 
-            extractor.analyzePrideXML(inputFile, assayNumber);
+            extractor.analyzePrideXML(inputFile, assayNumber,ExtractorConstants.ALLOW_ONLY_PRIDE_ANNOTATED);
             succeeded = true;
         } catch (Exception ex) {
             LOGGER.error(ex);

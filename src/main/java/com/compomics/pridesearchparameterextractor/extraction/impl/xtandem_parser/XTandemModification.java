@@ -4,7 +4,6 @@ import com.compomics.pride_asa_pipeline.model.ParameterExtractionException;
 import com.compomics.pride_asa_pipeline.model.modification.impl.UtilitiesPTMAdapter;
 import com.compomics.util.experiment.biology.PTM;
 import com.compomics.util.experiment.biology.PTMFactory;
-import com.compomics.util.pride.CvTerm;
 import uk.ac.ebi.pride.utilities.pridemod.ModReader;
 import uk.ac.ebi.pride.utilities.pridemod.model.Specificity;
 import uk.ac.ebi.pride.utilities.pridemod.model.UniModPTM;
