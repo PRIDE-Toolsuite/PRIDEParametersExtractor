@@ -84,10 +84,10 @@ public class FileParameterExtractor {
         //add a logger specific to this file
     }
 
-    private SearchParameters inferParameters(String assay) throws ParameterExtractionException, IOException {
+    private SearchParameters inferParameters(String assay,boolean allowOnlyPRIDEAnnotated) throws ParameterExtractionException, IOException {
 
         LOGGER.info("Attempting to infer searchparameters");
-        ParameterExtractor extractor = new ParameterExtractor(assay, analyzerData, modificationRepository);
+        ParameterExtractor extractor = new ParameterExtractor(assay, analyzerData, modificationRepository,allowOnlyPRIDEAnnotated);
         //extractor.setExperimentRepository(experimentRepository);
         IdentificationParameters parameters = extractor.getParameters();
 
@@ -115,7 +115,7 @@ public class FileParameterExtractor {
         mgf.delete();
     }
 
-    public SearchParameters analyzePrideXML(File inputFile, String assay) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
+    public SearchParameters analyzePrideXML(File inputFile, String assay,boolean allowOnlyPRIDEAnnotated) throws IOException, MGFExtractionException, MzXMLParsingException, JMzReaderException, XmlPullParserException, ClassNotFoundException, GOBOParseException, Exception {
         LOGGER.debug("Setting up experiment repository for assay " + assay);
         experimentRepository = FileExperimentModificationRepository.getInstance();
         experimentRepository.setExperimentIdentifier(assay);
@@ -126,10 +126,10 @@ public class FileParameterExtractor {
         modificationRepository.setExperimentIdentifier(assay);
         if(processMGF)
             processSpectra();
-        return inferParameters(assay);
+        return inferParameters(assay,allowOnlyPRIDEAnnotated);
     }
 
-    public SearchParameters analyzeMzID(File inputFile, List<File> peakFiles, String assay) throws MGFExtractionException, ParameterExtractionException, IOException, TimeoutException, InterruptedException, ExecutionException {
+    public SearchParameters analyzeMzID(File inputFile, List<File> peakFiles, String assay,boolean allowOnlyPRIDEAnnotated) throws MGFExtractionException, ParameterExtractionException, IOException, TimeoutException, InterruptedException, ExecutionException {
         LOGGER.debug("Setting up experiment repository for assay " + assay);
         experimentRepository = FileExperimentModificationRepository.getInstance();
         experimentRepository.setExperimentIdentifier(assay);
@@ -142,7 +142,7 @@ public class FileParameterExtractor {
         modificationRepository.setExperimentIdentifier(assay);
         if(processMGF)
             processSpectra();
-        return inferParameters(assay);
+        return inferParameters(assay, allowOnlyPRIDEAnnotated);
     }
 
 }

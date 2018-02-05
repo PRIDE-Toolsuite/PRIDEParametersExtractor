@@ -79,7 +79,7 @@ public class ModificationPredictor {
         this.assay = assay;
         this.modificationHolder = modificationHolder;
         repository = new FileModificationRepository();
-        inferModifications();
+        inferModifications(false);
     }
 
     /**
@@ -93,10 +93,37 @@ public class ModificationPredictor {
         this.assay = assay;
         this.modificationHolder = modificationHolder;
         this.repository = repository;
-        inferModifications();
+        inferModifications(false);
     }
 
-    private void inferModifications() {
+    /**
+     * A predictor for the modification profile
+     *
+     * @param assay the assay
+     * @param modificationHolder the modification holder
+     */
+    public ModificationPredictor(String assay, ModificationHolder modificationHolder, boolean allowOnlyPRIDEAnnotated) {
+        this.assay = assay;
+        this.modificationHolder = modificationHolder;
+        repository = new FileModificationRepository();
+        inferModifications(allowOnlyPRIDEAnnotated);
+    }
+
+    /**
+     * A predictor for the modification profile
+     *
+     * @param assay the assay
+     * @param modificationHolder the modification holder
+     * @param repository an initialized modification repository
+     */
+    public ModificationPredictor(String assay, ModificationHolder modificationHolder, ModificationRepository repository, boolean allowOnlyPRIDEAnnotated) {
+        this.assay = assay;
+        this.modificationHolder = modificationHolder;
+        this.repository = repository;
+        inferModifications(allowOnlyPRIDEAnnotated);
+    }
+
+    private void inferModifications(boolean allowOnlyPRIDEAnnotated) {
         LOGGER.info("Inferring modifications...");
         HashMap<String, Boolean> asapMods = new HashMap<>();
 
@@ -108,48 +135,52 @@ public class ModificationPredictor {
         for (Modification annotatedMod : modificationsByExperimentId) {
             asapMods.put(annotatedMod.getName(), false);
         }
-        if (modificationHolder != null) {
-            for (Modification aMod : modificationHolder.getAllModifications()) {
-                asapMods.put(aMod.getName(), false);
+
+        if (!allowOnlyPRIDEAnnotated) {
+
+            if (modificationHolder != null) {
+                for (Modification aMod : modificationHolder.getAllModifications()) {
+                    asapMods.put(aMod.getName(), false);
+                }
             }
-        }
-        //and add any new ones
-        HashSet<Double> encounteredMasses = new HashSet<>();
-        for (Map.Entry<String, Boolean> aMod : asapMods.entrySet()) {
-            try {
-                ArrayList<String> unknownPTM = new ArrayList<>();
-                String convertPridePtm = PTMFactory.getInstance().convertPridePtm(aMod.getKey(), ptmSettings, unknownPTM, false);
-                if (!unknownPTM.isEmpty()) {
-                    try {
-                        LOGGER.debug(aMod.getKey() + " is not a standard modification. Converting to utilities object");
-                        PTM aUtilitiesMod = (PTM) PRIDEModificationFactory.getInstance().getModification(adapter, aMod.getKey());
-                        if (!aUtilitiesMod.getName().toLowerCase().contains("unknown")) {
-                            if (!encounteredMasses.contains(aUtilitiesMod.getRoundedMass())) {
-                                encounteredMasses.add(aUtilitiesMod.getRoundedMass());
-                                if (aMod.getValue()) {
-                                    ptmSettings.addFixedModification(aUtilitiesMod);
+            //and add any new ones
+            HashSet<Double> encounteredMasses = new HashSet<>();
+            for (Map.Entry<String, Boolean> aMod : asapMods.entrySet()) {
+                try {
+                    ArrayList<String> unknownPTM = new ArrayList<>();
+                    String convertPridePtm = PTMFactory.getInstance().convertPridePtm(aMod.getKey(), ptmSettings, unknownPTM, false);
+                    if (!unknownPTM.isEmpty()) {
+                        try {
+                            LOGGER.debug(aMod.getKey() + " is not a standard modification. Converting to utilities object");
+                            PTM aUtilitiesMod = (PTM) PRIDEModificationFactory.getInstance().getModification(adapter, aMod.getKey());
+                            if (!aUtilitiesMod.getName().toLowerCase().contains("unknown")) {
+                                if (!encounteredMasses.contains(aUtilitiesMod.getRoundedMass())) {
+                                    encounteredMasses.add(aUtilitiesMod.getRoundedMass());
+                                    if (aMod.getValue()) {
+                                        ptmSettings.addFixedModification(aUtilitiesMod);
+                                    } else {
+                                        ptmSettings.addVariableModification(aUtilitiesMod);
+                                    }
+
                                 } else {
-                                    ptmSettings.addVariableModification(aUtilitiesMod);
+                                    LOGGER.warn("Duplicate mass, " + aMod.getKey() + " will be ignored");
                                 }
 
                             } else {
-                                LOGGER.warn("Duplicate mass, " + aMod.getKey() + " will be ignored");
+                                LOGGER.debug(aMod.getKey() + " was found in the default PTMs");
                             }
-
-                        } else {
-                            LOGGER.debug(aMod.getKey() + " was found in the default PTMs");
+                        } catch (ParameterExtractionException e) {
+                            LOGGER.error("Skipping" + aMod.getKey() + " : reason : " + e);
                         }
-                    } catch (ParameterExtractionException e) {
-                        LOGGER.error("Skipping" + aMod.getKey() + " : reason : " + e);
                     }
+
+                } catch (Exception e) {
+                    LOGGER.error(e);
+                    LOGGER.error("Modification could not be passed : " + aMod.getKey());
                 }
-
-            } catch (Exception e) {
-                LOGGER.error(e);
-                LOGGER.error("Modification could not be passed : " + aMod.getKey());
             }
-        }
 
+        }
         TotalReportGenerator.setPtmSettings(ptmSettings);
 
         TotalReportGenerator.setPtmSettingsMethod(

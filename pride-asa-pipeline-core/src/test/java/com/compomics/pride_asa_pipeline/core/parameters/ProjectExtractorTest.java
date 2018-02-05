@@ -58,13 +58,13 @@ public class ProjectExtractorTest extends TestCase {
         // File inputFile = getFileFromResources("PRIDE_Exp_Complete_Ac_3.xml.zip");
         File inputFile = getFileFromResources("PeptideShaker_Example.xml.zip");
 
-        SearchParameters identificationParameters = instance.analyzePrideXML(inputFile, "test_" + inputFile.getName().replace(".xml", ""));
+        SearchParameters identificationParameters = instance.analyzePrideXML(inputFile, "test_" + inputFile.getName().replace(".xml", ""), false);
 
         System.out.println();
         System.out.println("# ------------------------------------------------------------------");
         System.out.println("FINAL VERDICT");
         System.out.println("# ------------------------------------------------------------------");
-        System.out.println("The identification parameters are null : "+identificationParameters==null);
+        System.out.println("The identification parameters are null : " + identificationParameters == null);
         System.out.println(identificationParameters.toString());
 
         //it has to be better than these reported values
